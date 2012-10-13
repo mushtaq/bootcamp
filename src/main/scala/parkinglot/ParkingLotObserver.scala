@@ -9,11 +9,21 @@ trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot]
     _event = event
   }
 
-  def subscribeTo(parkingLot: ParkingLot, withThreshold: Double) {
+  def subscribeForOccupancy(parkingLot: ParkingLot, withThreshold: Double) {
     parkingLot.subscribe(this, _.filter(withThreshold))
+  }
+
+  def subscribeForMissingCar(parkingLot: ParkingLot) {
+    parkingLot.subscribe(this, isCarMissing)
+  }
+
+  private def isCarMissing(event: ParkingLotEvent) = event match {
+    case CarUnParked(_, _, None, _) => true
+    case _ => false
   }
 
 }
 
 class Owner extends ParkingLotObserver
 class FBIAgent extends ParkingLotObserver
+class PoliceDept extends ParkingLotObserver

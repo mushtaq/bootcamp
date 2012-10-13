@@ -82,7 +82,7 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `owner should be notified when the lot has space again` {
       val owner = new Owner
       val parkingLot = new ParkingLot(2, owner)
-      owner.subscribeTo(parkingLot, 100)
+      owner.subscribeForOccupancy(parkingLot, 100)
 
       owner.event should be(null)
 
@@ -103,7 +103,7 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `agent should be notified when the garage is less than 80% full again` {
       val parkingLot = new ParkingLot(10)
       val fbiAgent = new FBIAgent
-      fbiAgent.subscribeTo(parkingLot, 80)
+      fbiAgent.subscribeForOccupancy(parkingLot, 80)
 
       fbiAgent.event should be(null)
 
@@ -124,6 +124,32 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
 
       val car2 = parkingLot.unPark(token3.get)
       fbiAgent.event should be(CarUnParked(10, 7, car2, token3.get))
+    }
+
+    def `police department should be notified if a car is not found` {
+      val parkingLot = new ParkingLot(0)
+      val policeDept = new PoliceDept
+      policeDept.subscribeForMissingCar(parkingLot)
+
+      policeDept.event should be(null)
+
+      parkingLot.unPark(1234)
+      policeDept.event should be(CarUnParked(0, 0, None, 1234))
+    }
+
+    def `FBI agent should be notified if a car is not found` {
+      val parkingLot = new ParkingLot(1)
+      val policeDept = new PoliceDept
+      policeDept.subscribeForMissingCar(parkingLot)
+      policeDept.subscribeForOccupancy(parkingLot, 100)
+
+      policeDept.event should be(null)
+      parkingLot.unPark(1234)
+      policeDept.event should be(CarUnParked(1, 0, None, 1234))
+
+      val car = new Car
+      val token = parkingLot.park(car)
+      policeDept.event should be(CarParked(1, 1, token, car))
     }
 
   }

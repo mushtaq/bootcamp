@@ -13,7 +13,7 @@ class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[
   def unPark(token: Int): Option[Car] = {
     val carOption = parkings remove token
     if (carOption.isDefined) tokens += token
-    publish(CarUnParked(lots, parkings.size, carOption))
+    publish(CarUnParked(lots, parkings.size, carOption, token))
     carOption
   }
 
@@ -25,7 +25,7 @@ class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[
         parkings += (token -> car)
         Some(token)
       }
-    publish(CarParked(lots, parkings.size, tokenOption))
+    publish(CarParked(lots, parkings.size, tokenOption, car))
     tokenOption
   }
 }

@@ -25,11 +25,10 @@ trait AddableMeasure extends Measure {
   }
 }
 
-abstract class Length(val scale: Double, val name: String) extends AddableMeasure {
+class Length(val scale: Double, val name: String) extends AddableMeasure {
   type Q = Length#Quantity
   def isComparableWith(that: Any) = that.isInstanceOf[Q]
   def apply(n: Double) = new Quantity(n)
-  
 }
 
 object Length {
@@ -38,7 +37,7 @@ object Length {
   object Yards extends Length(36, "Yard")
 }
 
-abstract class Weight(val scale: Double, val name: String) extends AddableMeasure {
+class Weight(val scale: Double, val name: String) extends AddableMeasure {
   type Q = Weight#Quantity
   def isComparableWith(that: Any) = that.isInstanceOf[Q]
   def apply(n: Double) = new Quantity(n)

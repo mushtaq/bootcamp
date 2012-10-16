@@ -26,13 +26,15 @@ class MeasureSpec extends Spec with ShouldMatchers {
       2.kilogram should be(2000.gram)
       2.ton should be(200000.gram)
       2.ton should be(200.kilogram)
+//      3000.gram isEqualTo 2.yards should be(true) //compile time error
+
     }
 
     def `test addition` {
       2.kilogram + 3.kilogram should be(5.kilogram)
       2.kilogram + 3000.gram should be(5.kilogram)
       3000.gram + 2.kilogram should be(5000.gram)
-      3000.gram + 2.kilogram should be(5000.gram)
+//      3000.gram + 2.yards should be(5000.gram) //compile time error
     }
   }
 

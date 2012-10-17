@@ -82,7 +82,8 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `owner should be notified when the lot has space again` {
       val owner = new Owner
       val parkingLot = new ParkingLot(2, owner)
-      owner.subscribeForOccupancy(parkingLot, 100)
+      parkingLot.subscribe(owner, evt => evt.justCameBelow(100))
+      parkingLot.subscribe(owner, evt => evt.justCrossed(100))
 
       owner.event should be(null)
 
@@ -103,7 +104,8 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `agent should be notified when the garage is less than 80% full again` {
       val parkingLot = new ParkingLot(10)
       val fbiAgent = new FBIAgent
-      fbiAgent.subscribeForOccupancy(parkingLot, 80)
+      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(80))
+      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(80))
 
       fbiAgent.event should be(null)
 
@@ -129,7 +131,7 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `police department should be notified if a car is not found` {
       val parkingLot = new ParkingLot(0)
       val policeDept = new PoliceDept
-      policeDept.subscribeForMissingCar(parkingLot)
+      parkingLot.subscribe(policeDept, evt => evt.isCarMissing)
 
       policeDept.event should be(null)
 
@@ -139,17 +141,18 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
 
     def `FBI agent should be notified if a car is not found` {
       val parkingLot = new ParkingLot(1)
-      val policeDept = new PoliceDept
-      policeDept.subscribeForMissingCar(parkingLot)
-      policeDept.subscribeForOccupancy(parkingLot, 100)
+      val fbiAgent = new FBIAgent
+      parkingLot.subscribe(fbiAgent, evt => evt.isCarMissing)
+      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(80))
+      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(80))
 
-      policeDept.event should be(null)
+      fbiAgent.event should be(null)
       parkingLot.unPark(1234)
-      policeDept.event should be(CarUnParked(1, 0, None, 1234))
+      fbiAgent.event should be(CarUnParked(1, 0, None, 1234))
 
       val car = new Car
       val token = parkingLot.park(car)
-      policeDept.event should be(CarParked(1, 1, token, car))
+      fbiAgent.event should be(CarParked(1, 1, token, car))
     }
 
   }

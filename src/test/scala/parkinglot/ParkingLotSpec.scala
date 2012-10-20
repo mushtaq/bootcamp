@@ -139,12 +139,12 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       policeDept.latestEventFor(parkingLot).get should be(CarUnParked(0, 0, None, 1234))
     }
 
-    def `FBI agent should be notified if a car is not found` {
+    def `FBI agent should be notified if a car is not found or lot is full` {
       val parkingLot = new ParkingLot(1)
       val fbiAgent = new FBIAgent
       parkingLot.subscribe(fbiAgent, evt => evt.isCarMissing)
-      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(80))
-      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(80))
+      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(100))
+      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(100))
 
       fbiAgent.latestEventFor(parkingLot) should be(None)
       parkingLot.unPark(1234)

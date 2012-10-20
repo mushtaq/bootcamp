@@ -10,10 +10,12 @@ class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[
   private val tokens: mutable.Buffer[Int] = (1 to lots).to[mutable.Buffer]
   private val parkings: mutable.Map[Int, Car] = mutable.Map()
 
+  def currentStatus = ParkingLotStatusEvent(lots, parkings.size)
+
   def unPark(token: Int): Option[Car] = {
     val carOption = parkings remove token
     if (carOption.isDefined) tokens += token
-    publish(CarUnParked(lots, parkings.size, carOption, token))
+    publish(CarUnParkedEvent(lots, parkings.size, carOption, token))
     carOption
   }
 
@@ -25,7 +27,7 @@ class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[
         parkings += (token -> car)
         Some(token)
       }
-    publish(CarParked(lots, parkings.size, tokenOption, car))
+    publish(CarParkedEvent(lots, parkings.size, tokenOption, car))
     tokenOption
   }
 }

@@ -82,78 +82,88 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
     def `owner should be notified when the lot has space again` {
       val owner = new Owner
       val parkingLot = new ParkingLot(2, owner)
-      parkingLot.subscribe(owner, evt => evt.justCameBelow(100))
-      parkingLot.subscribe(owner, evt => evt.justCrossed(100))
+      owner.subscribeTo(parkingLot, evt => evt.justCrossed(100))
+      owner.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
 
-      owner.latestEventFor(parkingLot) should be(None)
+      owner.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(2, 0))
 
       parkingLot.park(new Car)
-      owner.latestEventFor(parkingLot) should be(None)
+      owner.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(2, 0))
 
       val car = new Car
       val token = parkingLot.park(car)
-      owner.latestEventFor(parkingLot).get should be(CarParked(2, 2, token, car))
+      owner.latestEventFor(parkingLot).get should be(CarParkedEvent(2, 2, token, car))
 
       parkingLot.unPark(token.get)
-      owner.latestEventFor(parkingLot).get should be(CarUnParked(2, 1, Some(car), token.get))
+      owner.latestEventFor(parkingLot).get should be(CarUnParkedEvent(2, 1, Some(car), token.get))
 
       parkingLot.unPark(token.get)
-      owner.latestEventFor(parkingLot).get should be(CarUnParked(2, 1, Some(car), token.get))
+      owner.latestEventFor(parkingLot).get should be(CarUnParkedEvent(2, 1, Some(car), token.get))
     }
 
     def `agent should be notified when the garage is less than 80% full again` {
       val parkingLot = new ParkingLot(10)
       val fbiAgent = new FBIAgent
-      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(80))
-      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(80))
+      fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(80))
+      fbiAgent.subscribeTo(parkingLot, evt => evt.justCameBelow(80))
 
-      fbiAgent.latestEventFor(parkingLot) should be(None)
+      fbiAgent.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(10, 0))
 
       1 to 7 foreach (_ => parkingLot.park(new Car))
-      fbiAgent.latestEventFor(parkingLot) should be(None)
+      fbiAgent.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(10, 0))
 
       val car = new Car
       val token = parkingLot.park(car)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarParked(10, 8, token, car))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarParkedEvent(10, 8, token, car))
 
       val token2 = parkingLot.park(new Car)
       val token3 = parkingLot.park(new Car)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarParked(10, 8, token, car))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarParkedEvent(10, 8, token, car))
 
       parkingLot.unPark(token.get)
       parkingLot.unPark(token2.get)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarParked(10, 8, token, car))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarParkedEvent(10, 8, token, car))
 
       val car2 = parkingLot.unPark(token3.get)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarUnParked(10, 7, car2, token3.get))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarUnParkedEvent(10, 7, car2, token3.get))
     }
 
     def `police department should be notified if a car is not found` {
       val parkingLot = new ParkingLot(0)
       val policeDept = new PoliceDept
-      parkingLot.subscribe(policeDept, evt => evt.isCarMissing)
+      policeDept.subscribeTo(parkingLot, evt => evt.isCarMissing)
 
-      policeDept.latestEventFor(parkingLot) should be(None)
+      policeDept.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(0, 0))
 
       parkingLot.unPark(1234)
-      policeDept.latestEventFor(parkingLot).get should be(CarUnParked(0, 0, None, 1234))
+      policeDept.latestEventFor(parkingLot).get should be(CarUnParkedEvent(0, 0, None, 1234))
     }
 
     def `FBI agent should be notified if a car is not found or lot is full` {
       val parkingLot = new ParkingLot(1)
       val fbiAgent = new FBIAgent
-      parkingLot.subscribe(fbiAgent, evt => evt.isCarMissing)
-      parkingLot.subscribe(fbiAgent, evt => evt.justCameBelow(100))
-      parkingLot.subscribe(fbiAgent, evt => evt.justCrossed(100))
+      fbiAgent.subscribeTo(parkingLot, evt => evt.isCarMissing)
+      fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(100))
+      fbiAgent.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
 
-      fbiAgent.latestEventFor(parkingLot) should be(None)
+      fbiAgent.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(1, 0))
       parkingLot.unPark(1234)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarUnParked(1, 0, None, 1234))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarUnParkedEvent(1, 0, None, 1234))
 
       val car = new Car
       val token = parkingLot.park(car)
-      fbiAgent.latestEventFor(parkingLot).get should be(CarParked(1, 1, token, car))
+      fbiAgent.latestEventFor(parkingLot).get should be(CarParkedEvent(1, 1, token, car))
     }
+
+//    def `attendant parks car in a lot with space` {
+//      val parkingLot = new ParkingLot(1)
+//      val attendant = new ParkingLotAttendant
+//      parkingLot.subscribe(attendant, evt => evt.justCrossed(100))
+//      parkingLot.subscribe(attendant, evt => evt.justCameBelow(100))
+//      val car = new Car
+//      attendant.park(car).get should be(1)
+//      parkingLot.unPark(1).get should be(car)
+//    }
 
   }
 

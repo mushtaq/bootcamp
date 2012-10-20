@@ -1,27 +1,29 @@
 package parkinglot
 
 sealed trait ParkingLotEvent {
+  def totalLots: Int
+  def occupiedLots: Int
+
   def justCrossed(threshold: Double) = false
   def justCameBelow(threshold: Double) = false
   def isCarMissing = false
 
-  def totalLots: Int
-  def occupiedLots: Int
-  protected def preEventOccupiedSlots: Int
-
+  protected def preEventOccupiedLots: Int = occupiedLots
   protected def occupiedPercent = percentOf(occupiedLots)
-  protected def preEventOccupiedPercent = percentOf(preEventOccupiedSlots)
+  protected def preEventOccupiedPercent = percentOf(preEventOccupiedLots)
 
   private def percentOf(lots: Int) = 100.0 * lots / totalLots
 }
 
-case class CarParked(totalLots: Int, occupiedLots: Int, token: Option[Int], car: Car) extends ParkingLotEvent {
+case class ParkingLotStatusEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent
+
+case class CarParkedEvent(totalLots: Int, occupiedLots: Int, token: Option[Int], car: Car) extends ParkingLotEvent {
   override def justCrossed(threshold: Double) = preEventOccupiedPercent < threshold && occupiedPercent >= threshold
-  def preEventOccupiedSlots = occupiedLots - token.size
+  override def preEventOccupiedLots = occupiedLots - token.size
 }
 
-case class CarUnParked(totalLots: Int, occupiedLots: Int, car: Option[Car], token: Int) extends ParkingLotEvent {
+case class CarUnParkedEvent(totalLots: Int, occupiedLots: Int, car: Option[Car], token: Int) extends ParkingLotEvent {
   override def justCameBelow(threshold: Double) = occupiedPercent < threshold && preEventOccupiedPercent >= threshold
   override def isCarMissing = car.isEmpty
-  def preEventOccupiedSlots = occupiedLots + car.size
+  override def preEventOccupiedLots = occupiedLots + car.size
 }

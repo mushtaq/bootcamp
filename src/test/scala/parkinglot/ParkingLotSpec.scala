@@ -155,15 +155,15 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       fbiAgent.latestEventFor(parkingLot).get should be(CarParkedEvent(1, 1, token, car))
     }
 
-//    def `attendant parks car in a lot with space` {
-//      val parkingLot = new ParkingLot(1)
-//      val attendant = new ParkingLotAttendant
-//      parkingLot.subscribe(attendant, evt => evt.justCrossed(100))
-//      parkingLot.subscribe(attendant, evt => evt.justCameBelow(100))
-//      val car = new Car
-//      attendant.park(car).get should be(1)
-//      parkingLot.unPark(1).get should be(car)
-//    }
+    def `attendant parks car in a lot with space` {
+      val parkingLot = new ParkingLot(1)
+      val attendant = new ParkingLotAttendant
+      attendant.subscribeTo(parkingLot, evt => evt.justCrossed(100))
+      attendant.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
+      val car = new Car
+      attendant.park(car).get should be(1)
+      parkingLot.unPark(1).get should be(car)
+    }
 
   }
 

@@ -4,6 +4,8 @@ sealed trait ParkingLotEvent {
   def totalLots: Int
   def occupiedLots: Int
 
+  def availableLots = totalLots - occupiedLots
+
   def justCrossed(threshold: Double) = false
   def justCameBelow(threshold: Double) = false
   def isCarMissing = false

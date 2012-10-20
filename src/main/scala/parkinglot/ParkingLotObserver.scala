@@ -3,10 +3,12 @@ package parkinglot
 import collection.mutable
 
 trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot] {
-  private var _event: ParkingLotEvent = _
-  def event = _event
+  private val _parkingLotEvents: mutable.Map[ParkingLot, ParkingLotEvent] = mutable.Map()
+
+  def latestEventFor(parkingLot: ParkingLot) = _parkingLotEvents.get(parkingLot)
+
   def notify(pub: ParkingLot, event: ParkingLotEvent) {
-    _event = event
+    _parkingLotEvents(pub) = event
   }
 }
 

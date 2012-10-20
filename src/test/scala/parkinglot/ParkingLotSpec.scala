@@ -83,7 +83,6 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       val owner = new Owner
       val parkingLot = new ParkingLot(2, owner)
       owner.subscribeTo(parkingLot, evt => evt.justCrossed(100))
-      owner.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
 
       owner.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(2, 0))
 
@@ -105,7 +104,6 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       val parkingLot = new ParkingLot(10)
       val fbiAgent = new FBIAgent
       fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(80))
-      fbiAgent.subscribeTo(parkingLot, evt => evt.justCameBelow(80))
 
       fbiAgent.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(10, 0))
 
@@ -144,7 +142,6 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       val fbiAgent = new FBIAgent
       fbiAgent.subscribeTo(parkingLot, evt => evt.isCarMissing)
       fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(100))
-      fbiAgent.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
 
       fbiAgent.latestEventFor(parkingLot).get should be(ParkingLotStatusEvent(1, 0))
       parkingLot.unPark(1234)
@@ -157,13 +154,45 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
 
     def `attendant parks car in a lot with space` {
       val parkingLot = new ParkingLot(1)
+      val parkingLot2 = new ParkingLot(0)
       val attendant = new ParkingLotAttendant
+
       attendant.subscribeTo(parkingLot, evt => evt.justCrossed(100))
-      attendant.subscribeTo(parkingLot, evt => evt.justCameBelow(100))
-      val car = new Car
-      attendant.park(car).get should be(1)
-      parkingLot.unPark(1).get should be(car)
+      attendant.subscribeTo(parkingLot2, evt => evt.justCrossed(100))
+
+      parkingLot.currentStatus shouldBe(ParkingLotStatusEvent(1, 0))
+      parkingLot2.currentStatus shouldBe(ParkingLotStatusEvent(0, 0))
+
+      attendant.parkRandom(new Car).get should be(1)
+
+      parkingLot.currentStatus shouldBe(ParkingLotStatusEvent(1, 1))
+      parkingLot2.currentStatus shouldBe(ParkingLotStatusEvent(0, 0))
+
     }
+
+    def `attendant parks car evenly in a lot with space` {
+      val parkingLot = new ParkingLot(2)
+      Thread.sleep(1)
+      val parkingLot2 = new ParkingLot(2)
+      println(parkingLot.latestParkingTime)
+      println(parkingLot2.latestParkingTime)
+      val attendant = new ParkingLotAttendant
+
+      attendant.subscribeTo(parkingLot, evt => evt.justCrossed(100))
+      attendant.subscribeTo(parkingLot2, evt => evt.justCrossed(100))
+
+      parkingLot.currentStatus shouldBe(ParkingLotStatusEvent(2, 0))
+      parkingLot2.currentStatus shouldBe(ParkingLotStatusEvent(2, 0))
+
+      attendant.parkRoundRobin(new Car).get should be(1)
+      parkingLot.currentStatus shouldBe(ParkingLotStatusEvent(2, 1))
+      parkingLot2.currentStatus shouldBe(ParkingLotStatusEvent(2, 0))
+
+      attendant.parkRoundRobin(new Car).get should be(1)
+      parkingLot.currentStatus shouldBe(ParkingLotStatusEvent(2, 1))
+      parkingLot2.currentStatus shouldBe(ParkingLotStatusEvent(2, 1))
+    }
+
 
   }
 

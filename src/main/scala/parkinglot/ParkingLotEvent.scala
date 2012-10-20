@@ -4,10 +4,9 @@ sealed trait ParkingLotEvent {
   def totalLots: Int
   def occupiedLots: Int
 
-  def availableLots = totalLots - occupiedLots
-
-  def justCrossed(threshold: Double) = false
+  def justWentAbove(threshold: Double) = false
   def justCameBelow(threshold: Double) = false
+  def justCrossed(threshold: Double) = justWentAbove(threshold) || justCameBelow(threshold)
   def isCarMissing = false
 
   protected def preEventOccupiedLots: Int = occupiedLots
@@ -20,7 +19,7 @@ sealed trait ParkingLotEvent {
 case class ParkingLotStatusEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent
 
 case class CarParkedEvent(totalLots: Int, occupiedLots: Int, token: Option[Int], car: Car) extends ParkingLotEvent {
-  override def justCrossed(threshold: Double) = preEventOccupiedPercent < threshold && occupiedPercent >= threshold
+  override def justWentAbove(threshold: Double) = preEventOccupiedPercent < threshold && occupiedPercent >= threshold
   override def preEventOccupiedLots = occupiedLots - token.size
 }
 

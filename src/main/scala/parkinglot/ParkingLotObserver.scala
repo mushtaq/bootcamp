@@ -31,9 +31,10 @@ class FBIAgent extends ParkingLotObserver
 class PoliceDept extends ParkingLotObserver
 
 class ParkingLotAttendant extends ParkingLotObserver {
-  def park(car: Car, lots: Option[ParkingLot]): Option[Int] = lots flatMap (parkingLot => parkingLot.park(car))
+  def park(car: Car, lots: Try[ParkingLot]): Option[Int] = lots.toOption flatMap (parkingLot => parkingLot.park(car))
 
-  def parkRandom(car: Car): Option[Int] = park(car, lotsWithSpace.headOption)
-  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.latestParkingTime.millis)).toOption)
-  def parkWithMaxSpace(car: Car): Option[Int] = park(car, Try(lotsWithSpace.maxBy(_.availableLots)).toOption)
+  def parkRandom(car: Car): Option[Int] = park(car, Try(lotsWithSpace.head))
+  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.latestParkingTime.millis)))
+  def parkWithMaxSpace(car: Car): Option[Int] = park(car, Try(lotsWithSpace.maxBy(_.availableLots)))
+  def parkInClosest(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.distance)))
 }

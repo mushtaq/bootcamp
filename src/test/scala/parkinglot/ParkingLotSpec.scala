@@ -207,6 +207,22 @@ class ParkingLotSpec extends Spec with ShouldMatchers {
       parkingLot2.currentStatus shouldBe ParkingLotStatusEvent(2, 0)
     }
 
+    def `attendant parks car in a lot which is closest` {
+      val parkingLot = new ParkingLot(2, distance = 10)
+      val parkingLot2 = new ParkingLot(2, distance = 20)
+      val attendant = new ParkingLotAttendant
+
+      attendant.subscribeToAllEvents(parkingLot)
+      attendant.subscribeToAllEvents(parkingLot2)
+
+      parkingLot.currentStatus shouldBe ParkingLotStatusEvent(2, 0)
+      parkingLot2.currentStatus shouldBe ParkingLotStatusEvent(2, 0)
+
+      attendant.parkWithMaxSpace(new Car).get shouldBe 1
+      parkingLot.currentStatus shouldBe ParkingLotStatusEvent(2, 1)
+      parkingLot2.currentStatus shouldBe ParkingLotStatusEvent(2, 0)
+    }
+
   }
 
 }

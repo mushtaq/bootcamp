@@ -5,7 +5,7 @@ import org.scala_tools.time.Imports._
 
 class Car
 
-class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[ParkingLotEvent] {
+class ParkingLot(lots: Int, owner: Owner = new Owner, val distance: Double = 0) extends mutable.Publisher[ParkingLotEvent] {
 
   type Pub = ParkingLot
   private val tokens: mutable.Buffer[Int] = (1 to lots).to[mutable.Buffer]

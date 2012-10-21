@@ -17,6 +17,7 @@ class ParkingLot(lots: Int, owner: Owner = new Owner) extends mutable.Publisher[
   def currentStatus = ParkingLotStatusEvent(lots, parkings.size)
 
   def isParkingAvailable = tokens.nonEmpty
+  def availableLots = tokens.size
 
   def unPark(token: Int): Option[Car] = {
     val carOption = parkings remove token

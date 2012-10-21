@@ -16,6 +16,11 @@ trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot]
     parkingLot.subscribe(this, filter)
   }
 
+  def subscribeToAllEvents(parkingLot: ParkingLot) {
+    _parkingLotEvents(parkingLot) = parkingLot.currentStatus
+    parkingLot.subscribe(this)
+  }
+
   def notify(pub: ParkingLot, event: ParkingLotEvent) {
     _parkingLotEvents(pub) = event
   }
@@ -30,4 +35,5 @@ class ParkingLotAttendant extends ParkingLotObserver {
 
   def parkRandom(car: Car): Option[Int] = park(car, lotsWithSpace.headOption)
   def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.latestParkingTime.millis)).toOption)
+  def parkWithMaxSpace(car: Car): Option[Int] = park(car, Try(lotsWithSpace.maxBy(_.availableLots)).toOption)
 }

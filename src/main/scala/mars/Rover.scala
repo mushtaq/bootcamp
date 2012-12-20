@@ -12,12 +12,36 @@ object Direction {
   case object South extends Direction(0, -1, East, West)
 }
 
-case class Rover(x: Int, y: Int, direction: Direction) {
+case class Rover(position: Point, direction: Direction) {
   def change(command: Char) = command match {
-    case 'L' => Rover(x, y, direction.left)
-    case 'R' => Rover(x, y, direction.right)
-    case 'M' => Rover(x + direction.dx, y + direction.dy, direction)
+    case 'L' => Rover(position, direction.left)
+    case 'R' => Rover(position, direction.right)
+    case 'M' => Rover(position.moveIn(direction), direction)
   }
 
-  def move(commands: String) = commands.foldLeft(this)(_ change _)
+  def finalState(commands: String) = commands.foldLeft(this)(_ change _)
+}
+
+case class Point(x: Int, y: Int) {
+  def <=(other: Point) = x <= other.x && y <= other.y
+  def >=(other: Point) = x >= other.x && y >= other.y
+  def moveIn(direction: Direction) = Point(x + direction.dx, y + direction.dy)
+}
+
+case class Plateau(bottomLeft: Point, topRight: Point, beacons: Set[Rover]) {
+  def contains(rover: Rover) = bottomLeft <= rover.position && topRight >= rover.position
+
+  def finalState(rover: Rover, commands: String): Rover =
+    commands.foldLeft(rover){ (currentState, command) =>
+      val nextState = currentState.change(command)
+      val shouldMove = this.contains(currentState) && !beacons.contains(nextState)
+      if (shouldMove) nextState else currentState
+    }
+
+  def navigate(rover: Rover, commands: String): (Plateau, Rover) = {
+    val lastState = finalState(rover, commands)
+    val newBeacons = if (this.contains(lastState)) beacons else beacons + lastState
+    val newPlateau = Plateau(bottomLeft, topRight, newBeacons)
+    (newPlateau, lastState)
+  }
 }

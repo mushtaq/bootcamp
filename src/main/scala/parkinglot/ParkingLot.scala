@@ -1,7 +1,7 @@
 package parkinglot
 
 import collection.mutable
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 
 class Car
 

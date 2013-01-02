@@ -1,7 +1,7 @@
 package parkinglot
 
 import collection.mutable
-import org.scala_tools.time.Imports._
+import com.github.nscala_time.time.Imports._
 import util.Try
 
 trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot] {

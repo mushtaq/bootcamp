@@ -11,15 +11,15 @@ trait Measure {
     def magnitudeInBaseUnit: Double
     
     def isEqualTo(that: Q) = this.magnitudeInBaseUnit == that.magnitudeInBaseUnit
-    override def equals(that: Any) = if(isComparableWith(that)) isEqualTo(that.asInstanceOf[Q]) else false
-    override def toString = s"$name($magnitude)"
+    override def equals(that: Any) = isComparableWith(that) && isEqualTo(that.asInstanceOf[Q])
+    override def toString = s"$magnitude $name"
   }
 }
 
 trait AddableMeasure extends Measure {
   def scale: Double
   
-  class Quantity(val magnitude: Double) extends super.Quantity {
+  trait Quantity extends super.Quantity {
     def magnitudeInBaseUnit = scale * magnitude
     def +(that: Q): Q = apply((this.magnitudeInBaseUnit + that.magnitudeInBaseUnit) / scale)
   }
@@ -29,6 +29,7 @@ class Length(val scale: Double, val name: String) extends AddableMeasure {
   type Q = Length#Quantity
   def isComparableWith(that: Any) = that.isInstanceOf[Q]
   def apply(n: Double) = new Quantity(n)
+  class Quantity(val magnitude: Double) extends super.Quantity
 }
 
 object Length {
@@ -41,6 +42,7 @@ class Weight(val scale: Double, val name: String) extends AddableMeasure {
   type Q = Weight#Quantity
   def isComparableWith(that: Any) = that.isInstanceOf[Q]
   def apply(n: Double) = new Quantity(n)
+  class Quantity(val magnitude: Double) extends super.Quantity
 }
 
 object Weight {
@@ -70,4 +72,3 @@ object Temperature {
     def convertToBase(value: Double) = (value - 32) * 5 / 9
   }
 }
-

@@ -3,6 +3,8 @@ package unit
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
 import Predef.{any2stringadd => _, _}
+import unit.Length.Feet
+import unit.Weight.Gram
 
 class MeasureSpec extends Spec with ShouldMatchers {
 
@@ -11,6 +13,7 @@ class MeasureSpec extends Spec with ShouldMatchers {
   object `testing length` {
     def `test equality` {
       2.feet should be(24.inches)
+      2.feet should not be(24.gram)
       2.yards should be(72.inches)
       2.yards should be(6.feet)
     }
@@ -24,6 +27,7 @@ class MeasureSpec extends Spec with ShouldMatchers {
   object `testing weight` {
     def `test equality` {
       2.kilogram should be(2000.gram)
+      2.kilogram should not be(2000.feet)
       2.ton should be(200000.gram)
       2.ton should be(200.kilogram)
 //      3000.gram isEqualTo 2.yards should be(true) //compile time error
@@ -41,7 +45,7 @@ class MeasureSpec extends Spec with ShouldMatchers {
   object `testing temperature` {
     def `test equality` {
       37.celcius should be(98.6.fahrenheit)
+      37.celcius should not be(98.6.gram)
     }
   }
-
 }

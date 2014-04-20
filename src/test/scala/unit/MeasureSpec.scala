@@ -2,9 +2,6 @@ package unit
 
 import org.scalatest.Spec
 import org.scalatest.matchers.ShouldMatchers
-import Predef.{any2stringadd => _, _}
-import unit.Length.Feet
-import unit.Weight.Gram
 
 class MeasureSpec extends Spec with ShouldMatchers {
 
@@ -44,8 +41,8 @@ class MeasureSpec extends Spec with ShouldMatchers {
 
   object `testing temperature` {
     def `test equality` {
-      37.celcius should be(98.6.fahrenheit)
-      37.celcius should not be(98.6.gram)
+      37.celsius should be(98.6.fahrenheit)
+      37.celsius should not be(98.6.gram)
     }
   }
 }

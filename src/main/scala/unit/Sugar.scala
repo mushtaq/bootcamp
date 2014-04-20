@@ -18,7 +18,7 @@ object Sugar {
 
     import Temperature._
 
-    def celcius = Celcius(number)
+    def celsius = Celsius(number)
     def fahrenheit = Fahrenheit(number)
   }
 

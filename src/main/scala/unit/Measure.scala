@@ -18,7 +18,7 @@ trait Measure {
 
 trait AddableMeasure extends Measure {
   def scale: Double
-  
+
   trait Quantity extends super.Quantity {
     def magnitudeInBaseUnit = scale * magnitude
     def +(that: Q): Q = apply((this.magnitudeInBaseUnit + that.magnitudeInBaseUnit) / scale)
@@ -64,7 +64,7 @@ abstract class Temperature(val name: String) extends Measure {
 }
 
 object Temperature {
-  object Celcius extends Temperature("Celcius") {
+  object Celsius extends Temperature("Celsius") {
     def convertToBase(value: Double) = value
   }
 

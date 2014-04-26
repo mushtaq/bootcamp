@@ -10,6 +10,7 @@ class MeasureSpec extends Specification {
     "test equality" in {
       2.feet mustEqual 24.inches
       2.feet must not be(24.gram)
+      (2.feet == 24) must beFalse
       2.yards mustEqual(72.inches)
       2.yards mustEqual(6.feet)
     }

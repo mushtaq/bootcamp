@@ -3,20 +3,20 @@ package unit
 trait Measure {
   type Q <: Measure#Quantity
   def name: String
-  def apply(n: Double): Q
-  def isComparableWith(that: Any): Boolean
+  def apply(magnitude: Double): Q
+  def isQ(that: Any): Boolean
 
   trait Quantity {
     def magnitude: Double
     def magnitudeInBaseUnit: Double
     
     def isEqualTo(that: Q) = this.magnitudeInBaseUnit == that.magnitudeInBaseUnit
-    override def equals(that: Any) = isComparableWith(that) && isEqualTo(that.asInstanceOf[Q])
+    override def equals(that: Any) = isQ(that) && isEqualTo(that.asInstanceOf[Q])
     override def toString = s"$magnitude $name"
   }
 }
 
-trait AddableMeasure extends Measure {
+trait ScaledMeasure extends Measure {
   def scale: Double
 
   trait Quantity extends super.Quantity {
@@ -25,10 +25,10 @@ trait AddableMeasure extends Measure {
   }
 }
 
-class Length(val scale: Double, val name: String) extends AddableMeasure {
+class Length(val scale: Double, val name: String) extends ScaledMeasure {
   type Q = Length#Quantity
-  def isComparableWith(that: Any) = that.isInstanceOf[Q]
-  def apply(n: Double) = new Quantity(n)
+  def isQ(that: Any) = that.isInstanceOf[Q]
+  def apply(magnitude: Double) = new Quantity(magnitude)
   class Quantity(val magnitude: Double) extends super.Quantity
 }
 
@@ -38,10 +38,10 @@ object Length {
   object Yards extends Length(36, "Yard")
 }
 
-class Weight(val scale: Double, val name: String) extends AddableMeasure {
+class Weight(val scale: Double, val name: String) extends ScaledMeasure {
   type Q = Weight#Quantity
-  def isComparableWith(that: Any) = that.isInstanceOf[Q]
-  def apply(n: Double) = new Quantity(n)
+  def isQ(that: Any) = that.isInstanceOf[Q]
+  def apply(magnitude: Double) = new Quantity(magnitude)
   class Quantity(val magnitude: Double) extends super.Quantity
 }
 
@@ -52,11 +52,11 @@ object Weight {
 }
 
 abstract class Temperature(val name: String) extends Measure {
-  def convertToBase(value: Double): Double
+  def convertToBase(magnitude: Double): Double
 
   type Q = Temperature#Quantity
-  def isComparableWith(that: Any) = that.isInstanceOf[Q]
-  def apply(n: Double) = new Quantity(n)
+  def isQ(that: Any) = that.isInstanceOf[Q]
+  def apply(magnitude: Double) = new Quantity(magnitude)
 
   class Quantity(val magnitude: Double) extends super.Quantity {
     def magnitudeInBaseUnit = convertToBase(magnitude)
@@ -65,10 +65,10 @@ abstract class Temperature(val name: String) extends Measure {
 
 object Temperature {
   object Celsius extends Temperature("Celsius") {
-    def convertToBase(value: Double) = value
+    def convertToBase(magnitude: Double) = magnitude
   }
 
   object Fahrenheit extends Temperature("Fahrenheit") {
-    def convertToBase(value: Double) = (value - 32) * 5 / 9
+    def convertToBase(magnitude: Double) = (magnitude - 32) * 5 / 9
   }
 }

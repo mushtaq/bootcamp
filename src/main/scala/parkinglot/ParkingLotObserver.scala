@@ -7,7 +7,7 @@ import util.Try
 trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot] {
   private val _parkingLotEvents: mutable.Map[ParkingLot, ParkingLotEvent] = mutable.Map()
 
-  def lotsWithSpace = _parkingLotEvents.keys.collect{ case lot if lot.isParkingAvailable => lot}.to[Seq]
+  def lotsWithSpace = _parkingLotEvents.keys.filter(_.isParkingAvailable).to[Seq]
 
   def latestEventFor(parkingLot: ParkingLot) = _parkingLotEvents.get(parkingLot)
 

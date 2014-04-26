@@ -4,27 +4,35 @@ sealed trait ParkingLotEvent {
   def totalLots: Int
   def occupiedLots: Int
 
-  def justWentAbove(threshold: Double) = false
-  def justCameBelow(threshold: Double) = false
+  def preEventOccupiedLots: Int
+  def isCarMissing: Boolean
+  def justWentAbove(threshold: Double): Boolean
+  def justCameBelow(threshold: Double): Boolean
+
   def justCrossed(threshold: Double) = justWentAbove(threshold) || justCameBelow(threshold)
-  def isCarMissing = false
+  def occupiedPercent = percentOf(occupiedLots)
+  def preEventOccupiedPercent = percentOf(preEventOccupiedLots)
 
-  protected def preEventOccupiedLots: Int = occupiedLots
-  protected def occupiedPercent = percentOf(occupiedLots)
-  protected def preEventOccupiedPercent = percentOf(preEventOccupiedLots)
-
-  private def percentOf(lots: Int) = 100.0 * lots / totalLots
+  def percentOf(lots: Int) = 100.0 * lots / totalLots
 }
 
-case class ParkingLotStatusEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent
+case class ParkingLotStatusEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent {
+  def preEventOccupiedLots = occupiedLots
+  def isCarMissing = false
+  def justWentAbove(threshold: Double) = false
+  def justCameBelow(threshold: Double) = false
+}
 
 case class CarParkedEvent(totalLots: Int, occupiedLots: Int, token: Option[Int], car: Car) extends ParkingLotEvent {
-  override def justWentAbove(threshold: Double) = preEventOccupiedPercent < threshold && occupiedPercent >= threshold
-  override def preEventOccupiedLots = occupiedLots - token.size
+  def preEventOccupiedLots = occupiedLots - token.size
+  def isCarMissing = false
+  def justWentAbove(threshold: Double) = preEventOccupiedPercent < threshold && threshold <= occupiedPercent
+  def justCameBelow(threshold: Double) = false
 }
 
 case class CarUnParkedEvent(totalLots: Int, occupiedLots: Int, car: Option[Car], token: Int) extends ParkingLotEvent {
-  override def justCameBelow(threshold: Double) = occupiedPercent < threshold && preEventOccupiedPercent >= threshold
-  override def isCarMissing = car.isEmpty
-  override def preEventOccupiedLots = occupiedLots + car.size
+  def preEventOccupiedLots = occupiedLots + car.size
+  def isCarMissing = car.isEmpty
+  def justWentAbove(threshold: Double) = false
+  def justCameBelow(threshold: Double) = occupiedPercent < threshold && threshold <= preEventOccupiedPercent
 }

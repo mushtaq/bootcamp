@@ -1,44 +1,43 @@
 package mars
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.specs2.mutable.Specification
 
-class MarsRoverTest extends Spec with ShouldMatchers{
+class MarsRoverTest extends Specification {
 
   import Direction._
 
-  def `rover change` {
+  "rover change" in  {
     val rover = Rover(Point(3, 3), East)
-    rover.change('L') should be(Rover(Point(3, 3), North))
-    rover.change('R') should be(Rover(Point(3, 3), South))
-    rover.change('M') should be(Rover(Point(4, 3), East))
+    rover.change('L') mustEqual Rover(Point(3, 3), North)
+    rover.change('R') mustEqual Rover(Point(3, 3), South)
+    rover.change('M') mustEqual Rover(Point(4, 3), East)
   }
 
-  def `rover move` {
+  "rover move" in  {
     val rover = Rover(Point(3, 3), East)
-    rover.finalState("LLLMRR") should be(Rover(Point(3, 2), North))
+    rover.finalState("LLLMRR") mustEqual Rover(Point(3, 2), North)
   }
 
-  def `plateau die` {
+  "plateau die" in  {
     val rover = Rover(Point(3, 4), East)
     val plateau = Plateau(Point(0, 0), Point(4, 4), Set())
 
     val (plateauNew, roverNew) = plateau.navigate(rover, "MM")
 
-    plateauNew should be(Plateau(Point(0, 0), Point(4, 4), Set(Rover(Point(5, 4), East))))
-    roverNew should be(Rover(Point(5, 4), East))
-    plateau.contains(roverNew) should be(false)
+    plateauNew mustEqual Plateau(Point(0, 0), Point(4, 4), Set(Rover(Point(5, 4), East)))
+    roverNew mustEqual Rover(Point(5, 4), East)
+    plateau.contains(roverNew) must beFalse
   }
 
-  def `plateau survive` {
+  "plateau survive" in  {
     val rover = Rover(Point(3, 4), East)
     val plateau = Plateau(Point(0, 0), Point(4, 4), Set(Rover(Point(5, 4), East)))
 
     val (plateauNew, roverNew) = plateau.navigate(rover, "MM")
 
-    plateauNew should be(Plateau(Point(0, 0), Point(4, 4), Set(Rover(Point(5, 4), East))))
-    roverNew should be(Rover(Point(4, 4), East))
-    plateau.contains(roverNew) should be(true)
+    plateauNew mustEqual Plateau(Point(0, 0), Point(4, 4), Set(Rover(Point(5, 4), East)))
+    roverNew mustEqual Rover(Point(4, 4), East)
+    plateau.contains(roverNew) must beTrue
   }
 
 }

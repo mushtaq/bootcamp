@@ -11,7 +11,7 @@ class ParkingLot(val lots: Int, owner: Owner = new Owner, val distance: Double =
   private val parkings = Var(Map.empty[Int, Car])
 
   val lastParkingTime = Var(DateTime.now)
-  val status: Var[ParkingLotEvent] = Var(ParkingLotCreatedEvent(lots, parkings().size))
+  val status: Var[ParkingLotEvent] = Var(ParkingLotCreatedEvent(lots))
 
   def isParkingAvailable = tokens().nonEmpty
   def availableLots = tokens().size

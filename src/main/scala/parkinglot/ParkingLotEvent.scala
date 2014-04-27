@@ -16,7 +16,7 @@ sealed trait ParkingLotEvent {
   def percentOf(lots: Int) = 100.0 * lots / totalLots
 }
 
-case class ParkingLotStatusEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent {
+case class ParkingLotCreatedEvent(totalLots: Int, occupiedLots: Int) extends ParkingLotEvent {
   def preEventOccupiedLots = occupiedLots
   def isCarMissing = false
   def justWentAbove(threshold: Double) = false

@@ -1,29 +1,25 @@
 package parkinglot
 
-import collection.mutable
 import com.github.nscala_time.time.Imports._
 import util.Try
+import rx._
+import rx.ops.RxOps
 
-trait ParkingLotObserver extends mutable.Subscriber[ParkingLotEvent, ParkingLot] {
-  private val _parkingLotEvents: mutable.Map[ParkingLot, ParkingLotEvent] = mutable.Map()
+trait ParkingLotObserver {
+  private val parkingLotEvents = Var(Map.empty[ParkingLot, ParkingLotEvent])
 
-  def lotsWithSpace = _parkingLotEvents.keys.filter(_.isParkingAvailable).to[Seq]
+  def lotsWithSpace = parkingLotEvents().keys.filter(_.isParkingAvailable).to[Seq]
 
-  def latestEventFor(parkingLot: ParkingLot) = _parkingLotEvents.get(parkingLot)
+  def latestEventFor(parkingLot: ParkingLot) = parkingLotEvents().get(parkingLot)
 
-  def subscribeTo(parkingLot: ParkingLot, filter: ParkingLotEvent => Boolean) {
-    _parkingLotEvents(parkingLot) = parkingLot.currentStatus
-    parkingLot.subscribe(this, filter)
+  def subscribeTo(parkingLot: ParkingLot, filter: ParkingLotEvent => Boolean) = {
+    val event = parkingLot.status.filter(filter)
+    Obs(event) {
+      parkingLotEvents() += parkingLot -> event()
+    }
   }
 
-  def subscribeToAllEvents(parkingLot: ParkingLot) {
-    _parkingLotEvents(parkingLot) = parkingLot.currentStatus
-    parkingLot.subscribe(this)
-  }
-
-  def notify(pub: ParkingLot, event: ParkingLotEvent) {
-    _parkingLotEvents(pub) = event
-  }
+  def subscribeToAllEvents(parkingLot: ParkingLot) = subscribeTo(parkingLot, evt => true)
 }
 
 class Owner extends ParkingLotObserver
@@ -34,7 +30,7 @@ class ParkingLotAttendant extends ParkingLotObserver {
   def park(car: Car, lots: Try[ParkingLot]): Option[Int] = lots.toOption flatMap (parkingLot => parkingLot.park(car))
 
   def parkRandom(car: Car): Option[Int] = park(car, Try(lotsWithSpace.head))
-  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.latestParkingTime.millis)))
+  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.lastParkingTime().millis)))
   def parkWithMaxSpace(car: Car): Option[Int] = park(car, Try(lotsWithSpace.maxBy(_.availableLots)))
   def parkInClosest(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.distance)))
 }

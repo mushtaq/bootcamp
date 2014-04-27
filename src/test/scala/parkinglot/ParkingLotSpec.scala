@@ -4,6 +4,9 @@ import org.specs2.mutable.Specification
 
 class ParkingLotSpec extends Specification {
 
+  val car1 = new Car
+  val car2 = new Car
+
   "car parking" should {
     "should be able to park if a token is available" in {
       val parkingLot = new ParkingLot(1)
@@ -83,10 +86,10 @@ class ParkingLotSpec extends Specification {
       val parkingLot = new ParkingLot(2, owner)
       owner.subscribeTo(parkingLot, evt => evt.justCrossed(100))
 
-      owner.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(2, 0)
+      owner.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(2, 0)
 
       parkingLot.park(new Car)
-      owner.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(2, 0)
+      owner.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(2, 0)
 
       val car = new Car
       val token = parkingLot.park(car)
@@ -104,10 +107,10 @@ class ParkingLotSpec extends Specification {
       val fbiAgent = new FBIAgent
       fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(80))
 
-      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(10, 0)
+      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(10, 0)
 
       1 to 7 foreach (_ => parkingLot.park(new Car))
-      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(10, 0)
+      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(10, 0)
 
       val car = new Car
       val token = parkingLot.park(car)
@@ -130,7 +133,7 @@ class ParkingLotSpec extends Specification {
       val policeDept = new PoliceDept
       policeDept.subscribeTo(parkingLot, evt => evt.isCarMissing)
 
-      policeDept.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(0, 0)
+      policeDept.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(0, 0)
 
       parkingLot.unPark(1234)
       policeDept.latestEventFor(parkingLot).get mustEqual CarUnParkedEvent(0, 0, None, 1234)
@@ -142,7 +145,7 @@ class ParkingLotSpec extends Specification {
       fbiAgent.subscribeTo(parkingLot, evt => evt.isCarMissing)
       fbiAgent.subscribeTo(parkingLot, evt => evt.justCrossed(100))
 
-      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotStatusEvent(1, 0)
+      fbiAgent.latestEventFor(parkingLot).get mustEqual ParkingLotCreatedEvent(1, 0)
       parkingLot.unPark(1234)
       fbiAgent.latestEventFor(parkingLot).get mustEqual CarUnParkedEvent(1, 0, None, 1234)
 
@@ -159,13 +162,13 @@ class ParkingLotSpec extends Specification {
       attendant.subscribeTo(parkingLot, evt => evt.justCrossed(100))
       attendant.subscribeTo(parkingLot2, evt => evt.justCrossed(100))
 
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(1, 0)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(0, 0)
+      parkingLot.status() mustEqual ParkingLotCreatedEvent(1, 0)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(0, 0)
 
-      attendant.parkRandom(new Car).get mustEqual 1
+      attendant.parkRandom(car1).get mustEqual 1
 
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(1, 1)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(0, 0)
+      parkingLot.status() mustEqual CarParkedEvent(1,1,Some(1),car1)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(0, 0)
 
     }
 
@@ -178,16 +181,16 @@ class ParkingLotSpec extends Specification {
       attendant.subscribeToAllEvents(parkingLot)
       attendant.subscribeToAllEvents(parkingLot2)
 
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      parkingLot.status() mustEqual ParkingLotCreatedEvent(2, 0)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
 
-      attendant.parkRoundRobin(new Car).get mustEqual 1
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(2, 1)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      attendant.parkRoundRobin(car1).get mustEqual 1
+      parkingLot.status() mustEqual CarParkedEvent(2,1,Some(1),car1)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
 
-      attendant.parkRoundRobin(new Car).get mustEqual 1
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(2, 1)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 1)
+      attendant.parkRoundRobin(car2).get mustEqual 1
+      parkingLot.status() mustEqual CarParkedEvent(2,1,Some(1),car1)
+      parkingLot2.status() mustEqual CarParkedEvent(2,1,Some(1),car2)
     }
 
     "attendant parks car in a lot with max space" in {
@@ -198,12 +201,12 @@ class ParkingLotSpec extends Specification {
       attendant.subscribeToAllEvents(parkingLot)
       attendant.subscribeToAllEvents(parkingLot2)
 
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(4, 0)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      parkingLot.status() mustEqual ParkingLotCreatedEvent(4, 0)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
 
-      attendant.parkWithMaxSpace(new Car).get mustEqual 1
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(4, 1)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      attendant.parkWithMaxSpace(car1).get mustEqual 1
+      parkingLot.status() mustEqual CarParkedEvent(4,1,Some(1),car1)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
     }
 
     "attendant parks car in a lot which is closest" in {
@@ -214,12 +217,12 @@ class ParkingLotSpec extends Specification {
       attendant.subscribeToAllEvents(parkingLot)
       attendant.subscribeToAllEvents(parkingLot2)
 
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      parkingLot.status() mustEqual ParkingLotCreatedEvent(2, 0)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
 
-      attendant.parkInClosest(new Car).get mustEqual 1
-      parkingLot.currentStatus mustEqual ParkingLotStatusEvent(2, 1)
-      parkingLot2.currentStatus mustEqual ParkingLotStatusEvent(2, 0)
+      attendant.parkInClosest(car1).get mustEqual 1
+      parkingLot.status() mustEqual CarParkedEvent(2,1,Some(1),car1)
+      parkingLot2.status() mustEqual ParkingLotCreatedEvent(2, 0)
     }
 
   }

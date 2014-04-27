@@ -1,41 +1,42 @@
 package parkinglot
 
-import collection.mutable
 import com.github.nscala_time.time.Imports._
+import rx._
 
 class Car
 
-class ParkingLot(lots: Int, owner: Owner = new Owner, val distance: Double = 0) extends mutable.Publisher[ParkingLotEvent] {
+class ParkingLot(val lots: Int, owner: Owner = new Owner, val distance: Double = 0) {
 
-  type Pub = ParkingLot
-  private val tokens: mutable.Buffer[Int] = (1 to lots).to[mutable.Buffer]
-  private val parkings: mutable.Map[Int, Car] = mutable.Map()
-  private var _lastParkingTime = DateTime.now
+  private val tokens = Var(Seq(1 to lots: _*))
+  private val parkings = Var(Map.empty[Int, Car])
 
-  def latestParkingTime = _lastParkingTime
+  val lastParkingTime = Var(DateTime.now)
+  val status: Var[ParkingLotEvent] = Var(ParkingLotCreatedEvent(lots, parkings().size))
 
-  def currentStatus = ParkingLotStatusEvent(lots, parkings.size)
+  def isParkingAvailable = tokens().nonEmpty
+  def availableLots = tokens().size
 
-  def isParkingAvailable = tokens.nonEmpty
-  def availableLots = tokens.size
-
-  def unPark(token: Int): Option[Car] = {
-    val carOption = parkings remove token
-    if (carOption.isDefined) tokens += token
-    publish(CarUnParkedEvent(lots, parkings.size, carOption, token))
+  def unPark(token: Int) = {
+    val carOption = parkings().get(token)
+    if (carOption.isDefined) {
+      tokens() :+= token
+      parkings() -= token
+    }
+    status() = CarUnParkedEvent(lots, parkings().size, carOption, token)
     carOption
   }
 
-  def park(car: Car): Option[Int] = {
-    val tokenOption =
-      if (tokens.isEmpty) None
-      else {
-        val token = tokens remove 0
-        parkings += (token -> car)
-        _lastParkingTime = DateTime.now
+  def park(car: Car) = {
+    val tokenOption = tokens() match {
+      case Seq()         =>
+        None
+      case token +: tail =>
+        tokens() = tail
+        parkings() += (token -> car)
+        lastParkingTime() = DateTime.now
         Some(token)
-      }
-    publish(CarParkedEvent(lots, parkings.size, tokenOption, car))
+    }
+    status() = CarParkedEvent(lots, parkings().size, tokenOption, car)
     tokenOption
   }
 }

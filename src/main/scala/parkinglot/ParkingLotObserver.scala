@@ -30,7 +30,7 @@ class ParkingLotAttendant extends ParkingLotObserver {
   def park(car: Car, lots: Try[ParkingLot]): Option[Int] = lots.toOption flatMap (parkingLot => parkingLot.park(car))
 
   def parkRandom(car: Car): Option[Int] = park(car, Try(lotsWithSpace.head))
-  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.lastParkingTime().millis)))
+  def parkRoundRobin(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.lastParkingTime().getMillis)))
   def parkWithMaxSpace(car: Car): Option[Int] = park(car, Try(lotsWithSpace.maxBy(_.availableLots)))
   def parkInClosest(car: Car): Option[Int] = park(car, Try(lotsWithSpace.minBy(_.distance)))
 }

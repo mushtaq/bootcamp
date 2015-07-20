@@ -1,9 +1,11 @@
 name := "bootcamp"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
-  "com.github.nscala-time" %% "nscala-time" % "0.2.0",
-  "com.scalarx" %% "scalarx" % "0.2.4",
-  "org.specs2" %% "specs2" % "2.3.8" % "test"
+  "com.github.nscala-time" %% "nscala-time" % "2.0.0",
+  "com.lihaoyi" %% "scalarx" % "0.2.8",
+  "org.specs2" %% "specs2" % "2.4.16" % "test"
 )
+
+transitiveClassifiers in Global := Seq(Artifact.SourceClassifier)

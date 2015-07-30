@@ -2,7 +2,7 @@ package unit
 
 import org.specs2.mutable.Specification
 
-class MeasureSpec extends Specification {
+class QuantitySpec extends Specification {
 
   import Sugar._
 

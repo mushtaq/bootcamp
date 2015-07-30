@@ -1,22 +1,26 @@
 package unit
 
-trait Measure {
-  type Q <: Measure#Quantity
+trait QuantityFactory {
+  type Q <: QuantityFactory#Quantity
   def name: String
   def apply(magnitude: Double): Q
-  def isQ(that: Any): Boolean
 
   trait Quantity {
     def magnitude: Double
     def magnitudeInBaseUnit: Double
     
     def isEqualTo(that: Q) = this.magnitudeInBaseUnit == that.magnitudeInBaseUnit
-    override def equals(that: Any) = isQ(that) && isEqualTo(that.asInstanceOf[Q])
+
+    override def equals(that: Any) = that match {
+      case q: Q => isEqualTo(q)
+      case _    => false
+    }
+
     override def toString = s"$magnitude $name"
   }
 }
 
-trait ScaledMeasure extends Measure {
+trait ScaledQuantityFactory extends QuantityFactory {
   def scale: Double
 
   trait Quantity extends super.Quantity {
@@ -25,9 +29,8 @@ trait ScaledMeasure extends Measure {
   }
 }
 
-class Length(val scale: Double, val name: String) extends ScaledMeasure {
+class Length(val scale: Double, val name: String) extends ScaledQuantityFactory {
   type Q = Length#Quantity
-  def isQ(that: Any) = that.isInstanceOf[Q]
   def apply(magnitude: Double) = new Quantity(magnitude)
   class Quantity(val magnitude: Double) extends super.Quantity
 }
@@ -38,9 +41,8 @@ object Length {
   object Yards extends Length(36, "Yard")
 }
 
-class Weight(val scale: Double, val name: String) extends ScaledMeasure {
+class Weight(val scale: Double, val name: String) extends ScaledQuantityFactory {
   type Q = Weight#Quantity
-  def isQ(that: Any) = that.isInstanceOf[Q]
   def apply(magnitude: Double) = new Quantity(magnitude)
   class Quantity(val magnitude: Double) extends super.Quantity
 }
@@ -51,11 +53,10 @@ object Weight {
   object Ton extends Weight(100000, "Ton")
 }
 
-abstract class Temperature(val name: String) extends Measure {
+abstract class Temperature(val name: String) extends QuantityFactory {
   def convertToBase(magnitude: Double): Double
 
   type Q = Temperature#Quantity
-  def isQ(that: Any) = that.isInstanceOf[Q]
   def apply(magnitude: Double) = new Quantity(magnitude)
 
   class Quantity(val magnitude: Double) extends super.Quantity {

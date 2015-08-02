@@ -2,7 +2,10 @@ package unit
 
 object Sugar {
 
-  implicit class SugaredQuantity(val number: Double) extends AnyVal {
+  implicit class SugaredIntQuantity(val number1: Int) extends SugaredQuantity(number1)
+  implicit class SugaredDoubleQuantity(val number2: Double) extends SugaredQuantity(number2)
+
+  class SugaredQuantity(val number: Double) {
 
     import Length._
 

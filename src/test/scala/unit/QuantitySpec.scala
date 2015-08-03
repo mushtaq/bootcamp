@@ -11,6 +11,7 @@ class QuantitySpec extends Specification {
       2.feet must not be 24.gram
       2.feet == 24.inches must beTrue
       2.feet == 24.gram must beFalse
+      2.feet.in(Length.Inches) mustEqual 24.inches
       2.yards mustEqual 72.inches
       2.yards mustEqual 6.feet
     }
@@ -27,7 +28,8 @@ class QuantitySpec extends Specification {
       2.kilogram must not be 2000.feet
       2.ton mustEqual 200000.gram
       2.ton mustEqual 200.kilogram
-//      3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
+      // 2.ton.in(Length.Feet) mustEqual 200.kilogram //compile error
+//       3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
 
     }
 

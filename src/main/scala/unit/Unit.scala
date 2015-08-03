@@ -1,0 +1,82 @@
+package unit
+
+trait Unit { outer =>
+  type U <: Unit
+  type Q = U#Quantity
+  def name: String
+  def apply(magnitude: Double): Q
+  def isConvertible(that: Any): Boolean
+  def convertToBase(magnitude: Double): Double
+  def convertFromBase(magnitude: Double): Double
+
+  trait Quantity {
+    def magnitude: Double
+    def unit = outer
+
+    def magnitudeInBaseUnit = convertToBase(magnitude)
+
+    def isEqualTo(that: Q) = this.magnitudeInBaseUnit == that.magnitudeInBaseUnit
+    override def equals(that: Any) = isConvertible(that) && isEqualTo(that.asInstanceOf[Q])
+
+    def in(thatUnit: U) = thatUnit(thatUnit.convertFromBase(magnitudeInBaseUnit))
+    override def toString = s"$magnitude $name"
+  }
+}
+
+trait ScaledUnit extends Unit {
+  def scale: Double
+
+  def convertToBase(magnitude: Double) = magnitude * scale
+  def convertFromBase(magnitude: Double) = magnitude / scale
+
+  trait Quantity extends super.Quantity {
+    def +(that: Q): Q = apply(convertFromBase(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
+  }
+}
+
+class Length(val scale: Double, val name: String) extends ScaledUnit {
+  type U = Length
+
+  def isConvertible(that: Any) = that.isInstanceOf[U#Quantity]
+  def apply(magnitude: Double) = new Quantity(magnitude)
+  class Quantity(val magnitude: Double) extends super.Quantity
+}
+
+object Length {
+  object Inches extends Length(1, "Inches")
+  object Feet extends Length(12, "Feet")
+  object Yards extends Length(36, "Yard")
+}
+
+class Weight(val scale: Double, val name: String) extends ScaledUnit {
+  type U = Weight
+  def isConvertible(that: Any) = that.isInstanceOf[U#Quantity]
+  def apply(magnitude: Double) = new Quantity(magnitude)
+  class Quantity(val magnitude: Double) extends super.Quantity
+}
+
+object Weight {
+  object Gram extends Weight(1, "Gram")
+  object Kilogram extends Weight(1000, "Kilogram")
+  object Ton extends Weight(100000, "Ton")
+}
+
+abstract class Temperature(val name: String) extends Unit {
+  type U = Temperature
+  def isConvertible(that: Any) = that.isInstanceOf[U#Quantity]
+  def apply(magnitude: Double) = new Quantity(magnitude)
+
+  class Quantity(val magnitude: Double) extends super.Quantity
+}
+
+object Temperature {
+  object Celsius extends Temperature("Celsius") {
+    def convertToBase(magnitude: Double) = magnitude
+    def convertFromBase(magnitude: Double) = magnitude
+  }
+
+  object Fahrenheit extends Temperature("Fahrenheit") {
+    def convertToBase(magnitude: Double) = (magnitude - 32) * 5 / 9
+    def convertFromBase(magnitude: Double) = (magnitude * 9 / 5) + 32
+  }
+}

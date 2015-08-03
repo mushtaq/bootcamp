@@ -29,16 +29,16 @@ class QuantitySpec extends Specification {
       2.kilogram must not be 2000.feet
       2.ton mustEqual 200000.gram
       2.ton mustEqual 200.kilogram
-      //        2.ton.in(Length.Feet) mustEqual 200.kilogram //compile error
-      //        3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
+//              2.ton.in(Length.Feet) mustEqual 200.kilogram //compile error
+//              3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
 
     }
 
     "test addition" in {
       2.kilogram + 3.kilogram mustEqual 5.kilogram
       2.kilogram + 3000.gram mustEqual 5.kilogram
-      3000.gram + 2.kilogram mustEqual 5000.gram
-      //       3000.gram + 2.yards mustEqual(5000.gram) //compile time error
+      3000.gram + 2.kilogram + 2.ton mustEqual 205000.gram
+//             3000.gram + 2.yards mustEqual(5000.gram) //compile time error
     }
   }
 

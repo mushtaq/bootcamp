@@ -1,7 +1,7 @@
-package unit
+package unit.parameters
 
 import org.specs2.mutable.Specification
-import Sugar._
+import unit.parameters.Sugar._
 
 class QuantitySpec extends Specification {
 
@@ -31,7 +31,6 @@ class QuantitySpec extends Specification {
       2.ton mustEqual 200.kilogram
 //       2.ton.in(Length.Feet) mustEqual 200.kilogram //compile error
 //       3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
-
     }
 
     "test addition" in {

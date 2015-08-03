@@ -1,4 +1,4 @@
-package unit
+package unit.members
 
 trait Unit {
   type U <: Unit

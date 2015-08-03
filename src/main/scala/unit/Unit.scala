@@ -76,6 +76,7 @@ object Weight {
 
 abstract class Temperature(val name: String) extends Unit {
   type U = Temperature
+  val self = this
   def isConvertible(that: Unit) = that.isInstanceOf[U]
   def apply(magnitude: Double) = new Quantity(magnitude)
 
@@ -84,15 +85,11 @@ abstract class Temperature(val name: String) extends Unit {
 
 object Temperature {
   object Celsius extends Temperature("Celsius") {
-    val self = this
-
     def convertToBase(magnitude: Double) = magnitude
     def convertFromBase(magnitude: Double) = magnitude
   }
 
   object Fahrenheit extends Temperature("Fahrenheit") {
-    val self = this
-
     def convertToBase(magnitude: Double) = (magnitude - 32) * 5 / 9
     def convertFromBase(magnitude: Double) = (magnitude * 9 / 5) + 32
   }

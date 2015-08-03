@@ -3,10 +3,12 @@ package unit
 trait Unit {
   type U <: Unit
   type Q = U#Quantity
-  val self: U
+
   def name: String
+
   def apply(magnitude: Double): Q
   def isConvertible(that: Unit): Boolean
+
   def convertToBase(magnitude: Double): Double
   def convertFromBase(magnitude: Double): Double
 
@@ -17,7 +19,7 @@ trait Unit {
 
   trait Quantity {
     def magnitude: Double
-    def unit = self
+    def unit: U
 
     def magnitudeInBaseUnit = convertToBase(magnitude)
 
@@ -46,11 +48,9 @@ trait ScaledUnit extends Unit {
 
 class Length(val scale: Double, val name: String) extends ScaledUnit {
   type U = Length
-  val self = this
-
   def isConvertible(that: Unit) = that.isInstanceOf[U]
-  def apply(magnitude: Double) = new Quantity(magnitude)
-  class Quantity(val magnitude: Double) extends super.Quantity
+  def apply(magnitude: Double) = new Quantity(magnitude, this)
+  class Quantity(val magnitude: Double, val unit: U) extends super.Quantity
 }
 
 object Length {
@@ -61,11 +61,9 @@ object Length {
 
 class Weight(val scale: Double, val name: String) extends ScaledUnit {
   type U = Weight
-  val self = this
-
   def isConvertible(that: Unit) = that.isInstanceOf[U]
-  def apply(magnitude: Double) = new Quantity(magnitude)
-  class Quantity(val magnitude: Double) extends super.Quantity
+  def apply(magnitude: Double) = new Quantity(magnitude, this)
+  class Quantity(val magnitude: Double, val unit: U) extends super.Quantity
 }
 
 object Weight {
@@ -76,11 +74,9 @@ object Weight {
 
 abstract class Temperature(val name: String) extends Unit {
   type U = Temperature
-  val self = this
   def isConvertible(that: Unit) = that.isInstanceOf[U]
-  def apply(magnitude: Double) = new Quantity(magnitude)
-
-  class Quantity(val magnitude: Double) extends super.Quantity
+  def apply(magnitude: Double) = new Quantity(magnitude, this)
+  class Quantity(val magnitude: Double, val unit: U) extends super.Quantity
 }
 
 object Temperature {

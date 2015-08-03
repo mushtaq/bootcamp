@@ -11,6 +11,7 @@ class QuantitySpec extends Specification {
       2.feet must not be 24.gram
       2.feet == 24.inches must beTrue
       2.feet == 24.gram must beFalse
+      2.feet == 24 must beFalse
       2.feet.in(Length.Inches) mustEqual 24.inches
       2.yards mustEqual 72.inches
       2.yards mustEqual 6.feet

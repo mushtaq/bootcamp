@@ -30,7 +30,6 @@ class QuantitySpec extends Specification {
       2.ton mustEqual 200000.gram
       2.ton mustEqual 200.kilogram
 //              2.ton.in(Length.Feet) mustEqual 200.kilogram //compile error
-//              3000.gram isEqualTo 2.yards mustEqual(true) //compile time error
 
     }
 

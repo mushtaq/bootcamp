@@ -35,7 +35,7 @@ trait Unit[U <: Unit[U, Q], Q <: Quantity[U, Q]] {
 }
 
 trait ScaledQuantity[U <: Unit[U, Q], Q <: Quantity[U, Q]] extends Quantity[U, Q] {
-  def +(that: Q): Q = unit.apply(unit.convertFromBaseUnit(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
+  def +(that: Q): Q = unit(unit.convertFromBaseUnit(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
 }
 
 trait ScaledUnit[U <: Unit[U, Q], Q <: Quantity[U, Q]] extends Unit[U, Q] {

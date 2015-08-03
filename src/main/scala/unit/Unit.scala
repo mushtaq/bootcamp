@@ -9,8 +9,8 @@ trait Unit {
   def apply(magnitude: Double): Q
   def canBeConvertedTo(that: Unit): Boolean
 
-  def convertToBase(magnitude: Double): Double
-  def convertFromBase(magnitude: Double): Double
+  def inBaseUnits(magnitude: Double): Double
+  def fromBaseUnit(magnitude: Double): Double
 
   override def equals(that: Any) = that match {
     case x: Unit => canBeConvertedTo(x)
@@ -21,7 +21,7 @@ trait Unit {
     def magnitude: Double
     def unit: U
 
-    def magnitudeInBaseUnit = convertToBase(magnitude)
+    def magnitudeInBaseUnit = inBaseUnits(magnitude)
 
     def isEqualTo(that: Q) = this.magnitudeInBaseUnit == that.magnitudeInBaseUnit
 
@@ -30,7 +30,7 @@ trait Unit {
       case _    => false
     }
 
-    def in(thatUnit: U) = thatUnit(thatUnit.convertFromBase(magnitudeInBaseUnit))
+    def in(thatUnit: U) = thatUnit(thatUnit.fromBaseUnit(magnitudeInBaseUnit))
     override def toString = s"$magnitude $name"
   }
 }
@@ -38,11 +38,11 @@ trait Unit {
 trait ScaledUnit extends Unit {
   def scale: Double
 
-  def convertToBase(magnitude: Double) = magnitude * scale
-  def convertFromBase(magnitude: Double) = magnitude / scale
+  def inBaseUnits(magnitude: Double) = magnitude * scale
+  def fromBaseUnit(magnitude: Double) = magnitude / scale
 
   trait Quantity extends super.Quantity {
-    def +(that: Q): Q = apply(convertFromBase(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
+    def +(that: Q): Q = apply(fromBaseUnit(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
   }
 }
 
@@ -81,12 +81,12 @@ abstract class Temperature(val name: String) extends Unit {
 
 object Temperature {
   object Celsius extends Temperature("Celsius") {
-    def convertToBase(magnitude: Double) = magnitude
-    def convertFromBase(magnitude: Double) = magnitude
+    def inBaseUnits(magnitude: Double) = magnitude
+    def fromBaseUnit(magnitude: Double) = magnitude
   }
 
   object Fahrenheit extends Temperature("Fahrenheit") {
-    def convertToBase(magnitude: Double) = (magnitude - 32) * 5 / 9
-    def convertFromBase(magnitude: Double) = (magnitude * 9 / 5) + 32
+    def inBaseUnits(magnitude: Double) = (magnitude - 32) * 5 / 9
+    def fromBaseUnit(magnitude: Double) = (magnitude * 9 / 5) + 32
   }
 }

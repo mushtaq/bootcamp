@@ -1,0 +1,16 @@
+- Model quantities such that you can represent
+  - weights like 10 gram, 10 kilogram
+  - lengths 2 yard, 3 feet
+  - temperatures 10 celsius, 23 fahrenheit etc
+- Implement equality such that
+  - 2 feet == 24 inch
+  - 2 feet != 24 gram
+- Implement conversions such that
+  - 2 feet in inch gives 24 inch
+  - 2 feet in gram gives compile error
+- Implement addition only for scaled quantities like length and weight (but not temperature) such that
+  - 2 feet + 3 feet == 5 feet
+  - 2 feet + 12 inch == 3 feet
+  - 2 feet + 10 gram gives compile error
+- Ensure that your solution is DRY
+  - implement exactly one method for equality, conversion, addition across quantities

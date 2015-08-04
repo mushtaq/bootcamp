@@ -1,6 +1,6 @@
 package unit.members
 
-class Length extends ScaledMeasure {
+class LengthMeasure extends ScaledMeasure {
   type U = LengthUnit
 
   class LengthUnit(val scale: Double, val name: String) extends ScaledUnit {
@@ -8,7 +8,7 @@ class Length extends ScaledMeasure {
   }
 }
 
-object Length extends Length {
+object Length extends LengthMeasure {
   object Inches extends LengthUnit(1, "Inches")
   object Feet extends LengthUnit(12, "Feet")
   object Yards extends LengthUnit(36, "Yard")

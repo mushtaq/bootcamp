@@ -1,6 +1,6 @@
 package unit.members
 
-class Weight extends ScaledMeasure {
+class WeightMeasure extends ScaledMeasure {
   type U = WeightUnit
 
   class WeightUnit(val scale: Double, val name: String) extends ScaledUnit {
@@ -8,7 +8,7 @@ class Weight extends ScaledMeasure {
   }
 }
 
-object Weight extends Weight {
+object Weight extends WeightMeasure {
   object Gram extends WeightUnit(1, "Gram")
   object Kilogram extends WeightUnit(1000, "Kilogram")
   object Ton extends WeightUnit(100000, "Ton")

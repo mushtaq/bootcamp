@@ -12,5 +12,7 @@
   - 2 feet + 3 feet == 5 feet
   - 2 feet + 12 inch == 3 feet
   - 2 feet + 10 gram gives compile error
+- Ensure that you can chain additions without casting, like
+  - 2 feet + 12 inch + 1 feet == 4 feet
 - Ensure that your solution is DRY
   - implement exactly one method for equality, conversion, addition across quantities

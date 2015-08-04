@@ -1,4 +1,4 @@
-package unit.members2
+package unit.members
 
 trait ScaledMeasure extends Measure {
   type Q = ScaledQuantity

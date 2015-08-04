@@ -1,7 +1,7 @@
-package unit.members2
+package unit.members
 
 import org.specs2.mutable.Specification
-import unit.members2.Sugar._
+import unit.members.Sugar._
 
 class QuantitySpec extends Specification {
 

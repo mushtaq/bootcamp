@@ -1,4 +1,4 @@
-package unit.members2
+package unit.members
 
 object Sugar {
 

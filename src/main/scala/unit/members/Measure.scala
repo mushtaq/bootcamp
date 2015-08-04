@@ -1,4 +1,4 @@
-package unit.members2
+package unit.members
 
 trait Measure {
   type U <: Unit

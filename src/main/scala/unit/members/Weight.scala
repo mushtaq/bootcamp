@@ -1,4 +1,4 @@
-package unit.members2
+package unit.members
 
 class Weight extends ScaledMeasure {
   type U = WeightUnit

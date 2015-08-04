@@ -1,4 +1,4 @@
-package unit.members2
+package unit.members
 
 class Temperature extends Measure {
   type U = TemperatureUnit

@@ -16,7 +16,7 @@ trait Quantity[U <: Unit[U, Q], Q <: Quantity[U, Q]] {
   def in(thatUnit: U) = thatUnit(thatUnit.convertFromBaseUnit(magnitudeInBaseUnit))
 
   override def equals(that: Any) = that match {
-    case x: Quantity[_, _] => unit.canBeConvertedTo(x.unit) && this.magnitudeInBaseUnit == x.magnitudeInBaseUnit
+    case x: Quantity[_, _] => unit.canBeConvertedTo(x.unit) && magnitudeInBaseUnit == x.magnitudeInBaseUnit
     case _                 => false
   }
 

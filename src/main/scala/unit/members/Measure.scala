@@ -19,7 +19,7 @@ trait Measure {
     def in(thatUnit: U) = thatUnit(thatUnit.convertFromBaseUnit(magnitudeInBaseUnit))
 
     override def equals(that: Any) = that match {
-      case x: Quantity => this.magnitudeInBaseUnit == x.magnitudeInBaseUnit
+      case x: Quantity => magnitudeInBaseUnit == x.magnitudeInBaseUnit
       case _           => false
     }
 

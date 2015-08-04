@@ -11,6 +11,6 @@ trait ScaledMeasure extends Measure {
   }
 
   class ScaledQuantity(val magnitude: Double, val unit: U) extends Quantity {
-    def +(that: Q): Q = unit(unit.convertFromBaseUnit(this.magnitudeInBaseUnit + that.magnitudeInBaseUnit))
+    def +(that: Q): Q = unit(unit.convertFromBaseUnit(magnitudeInBaseUnit + that.magnitudeInBaseUnit))
   }
 }

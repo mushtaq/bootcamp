@@ -4,9 +4,6 @@ import org.specs2.mutable.Specification
 
 class ParkingLotSpec extends Specification {
 
-  val car1 = new Car
-  val car2 = new Car
-
   "car parking" should {
     "should be able to park if a token is available" in {
       val parkingLot = new ParkingLot(1)
@@ -66,7 +63,7 @@ class ParkingLotSpec extends Specification {
       val parkingLot = new ParkingLot(1)
 
       val token1 = parkingLot.park(new Car)
-      token1.get mustEqual(1)
+      token1.get mustEqual 1
 
       val token2 = parkingLot.park(new Car)
       token2 mustEqual None
@@ -171,6 +168,7 @@ class ParkingLotSpec extends Specification {
       parkingLot.status() mustEqual ParkingLotCreatedEvent(1)
       parkingLot2.status() mustEqual ParkingLotCreatedEvent(0)
 
+      val car1 = new Car
       attendant.parkRandom(car1).get mustEqual 1
 
       parkingLot.status() mustEqual CarParkedEvent(1,1,Some(1),car1)
@@ -189,6 +187,9 @@ class ParkingLotSpec extends Specification {
 
       parkingLot.status() mustEqual ParkingLotCreatedEvent(2)
       parkingLot2.status() mustEqual ParkingLotCreatedEvent(2)
+
+      val car1 = new Car
+      val car2 = new Car
 
       attendant.parkRoundRobin(car1).get mustEqual 1
       parkingLot.status() mustEqual CarParkedEvent(2,1,Some(1),car1)
@@ -210,6 +211,8 @@ class ParkingLotSpec extends Specification {
       parkingLot.status() mustEqual ParkingLotCreatedEvent(4)
       parkingLot2.status() mustEqual ParkingLotCreatedEvent(2)
 
+      val car1 = new Car
+
       attendant.parkWithMaxSpace(car1).get mustEqual 1
       parkingLot.status() mustEqual CarParkedEvent(4,1,Some(1),car1)
       parkingLot2.status() mustEqual ParkingLotCreatedEvent(2)
@@ -225,6 +228,8 @@ class ParkingLotSpec extends Specification {
 
       parkingLot.status() mustEqual ParkingLotCreatedEvent(2)
       parkingLot2.status() mustEqual ParkingLotCreatedEvent(2)
+
+      val car1 = new Car
 
       attendant.parkInClosest(car1).get mustEqual 1
       parkingLot.status() mustEqual CarParkedEvent(2,1,Some(1),car1)

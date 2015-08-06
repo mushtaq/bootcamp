@@ -8,5 +8,6 @@ trait ScaledUnit[U <: Unit[U, Q], Q <: Quantity[U, Q]] extends Unit[U, Q] {
 }
 
 class ScaledQuantity[U <: Unit[U, ScaledQuantity[U]]](val magnitude: Double, val unit: U) extends Quantity[U, ScaledQuantity[U]] {
-  def +(that: ScaledQuantity[U]): ScaledQuantity[U] = unit(unit.convertFromBaseUnit(magnitudeInBaseUnit + that.magnitudeInBaseUnit))
+  def +(that: ScaledQuantity[U]): ScaledQuantity[U] =
+    unit(unit.convertFromBaseUnit(magnitudeInBaseUnit + that.magnitudeInBaseUnit))
 }
